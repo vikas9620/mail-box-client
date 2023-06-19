@@ -3,49 +3,56 @@ import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
-const SignUp = () => {
+const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
-  const comfirmPasswordRef = useRef();
-
-  const signupHandler = (e) => {
+ const [token, setToken] = useState(null)
+const navigate = useNavigate()
+  const loginHandler = (e) => {
     e.preventDefault();
 
-    if (passwordRef.current.value === comfirmPasswordRef.current.value) {
-      const signDetails = {
+    const loginDetails = {
         email: emailRef.current.value,
         password: passwordRef.current.value,
-      };
-      const signup = async (signDetails) => {
+      }
+    
+      const login = async () => {
+       
         try {
           const response = await fetch(
-            "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDhgfETDmnPsAS67cOwZ1v4vIl9_86xuJ4",
+            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDhgfETDmnPsAS67cOwZ1v4vIl9_86xuJ4",
             {
               method: "POST",
               body: JSON.stringify({
-                ...signDetails,
+                ...loginDetails,
                 returnSecureToken: true,
               }),
               headers: { "Content-Type": "application/json" },
             }
           );
           if (response.ok) {
-            console.log("user signup successful");
+            const data = await response.json();
+            setToken(data.idToken)
+            localStorage.setItem("token", data.idToken)
+            localStorage.setItem('email', data.email)
+            console.log("user login successful");
+            navigate('/')
+           
           }
         } catch (err) {
-          console.log("failed to signup");
+          console.log("failed to login");
         }
-      };
-      signup(signDetails);
-    }else{
-     alert('password does not match confirm password');
+      
+
     }
+    login(loginDetails);
     emailRef.current.value=''
     passwordRef.current.value=''
-    comfirmPasswordRef.current.value=''
+   console.log(token)
   };
 
   return (
@@ -62,7 +69,7 @@ const SignUp = () => {
         left: "0",
         width: "100%",
         backgroundColor: "#007bff",
-        borderRadius: "700% 0% 0 0",
+        borderRadius: "100% 0% 0% 0%",
       }}
     >
       <Card style={{ width: "18rem", padding: "1rem" }}>
@@ -71,7 +78,7 @@ const SignUp = () => {
             className="mb-2"
             style={{ textAlign: "center", paddingBottom: "1rem" }}
           >
-            SignUp
+           Login
           </h4>
 
           <FloatingLabel
@@ -101,36 +108,26 @@ const SignUp = () => {
             />
           </FloatingLabel>
 
-          <FloatingLabel
-            className="mb-4"
-            controlId="formBasicConfirmPassword"
-            label="Confirm Password"
-          >
-            <Form.Control
-              type="password"
-              placeholder="Confirm password"
-              ref={comfirmPasswordRef}
-              required
-            />
-          </FloatingLabel>
+        
+           
 
           <div className="text-center">
             <Button
               className="mb-2"
               variant="primary"
               type="submit"
-              onClick={signupHandler}
+              onClick={loginHandler}
             >
-              Sign Up
+              Login
             </Button>
           </div>
         </Form>
       </Card>
-      <Button style={{ marginTop: "1rem" }} variant="outline-dark">
-        Have an account? Login
+      <Button style={{ marginTop: "1rem" }} variant="outline-dark" onClick={()=>{navigate('/signup')}}>
+       Don't Have an account? Sign up
       </Button>
     </div>
   );
 };
 
-export default SignUp;
+export default Login;
