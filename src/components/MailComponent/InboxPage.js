@@ -120,9 +120,7 @@ const dispatch = useDispatch()
                   justifyContent: "space-between",
                   alignItems: "center",
                 }}
-              >
-                Delete
-              </Button>
+              >Delete</Button>
             </div>
           </Accordion.Header>
           <Accordion.Body>{email.body}</Accordion.Body>
