@@ -38,18 +38,16 @@ const dispatch = useDispatch()
   };
 
   useEffect(() => {
-    const fetchEmailsInterval = setInterval(fetchMails, 2000);
+    setInterval(fetchMails, 2000);
   
-    return () => {
-      clearInterval(fetchEmailsInterval);
-    };
-  }, []);
+    
+  }, [setInterval]);
 
   const markAsRead = (emailId) => {
     setEmails((prevEmails) => {
       return prevEmails.map((email) => {
         if (email.id === emailId && !email.read) {
-          // Send PATCH request to update read status in the backend
+       
           fetch(
             `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${useremail}/inbox/${emailId}.json`,
             {
@@ -72,7 +70,7 @@ const dispatch = useDispatch()
     const deletedEmail = emails.find((email) => email.id === emailId);
 
     try {
-      // Send POST request to new API before deleting the email
+ 
       await fetch(`https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${useremail}/deletedmails.json`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -83,7 +81,7 @@ const dispatch = useDispatch()
     }
 
     try {
-      // Delete the email from the inbox in the backend
+  
       await fetch(
         `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${useremail}/inbox/${emailId}.json`,
         {

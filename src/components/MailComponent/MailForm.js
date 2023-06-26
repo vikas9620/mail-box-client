@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import { useSelector } from "react-redux";
+
 const EmailForm = () => {
   const [toEmail, setToEmail] = useState("");
   const emailId = useSelector((state) => state.auth.userId);
@@ -28,9 +28,9 @@ const EmailForm = () => {
       );
       const newEditorState = EditorState.createWithContent(contentState);
       setEditorState(newEditorState);
-      console.log(editorState);
     }
   };
+
   const handleToEmailChange = (event) => {
     setToEmail(event.target.value);
   };
@@ -39,7 +39,7 @@ const EmailForm = () => {
     setSubject(event.target.value);
   };
 
-  const handleSendEmail = () => {
+  const handleSendEmail = async () => {
     if (!validateEmail(toEmail)) {
       alert("Invalid email");
       return;
@@ -49,64 +49,101 @@ const EmailForm = () => {
       alert("Subject is required");
       return;
     }
+
     const emailAddress = toEmail.replace(/[@.]/g, "");
 
     const emailData = {
       subject: subject,
       body: body.replace(/<p>/g, "").replace(/<\/p>/g, ""),
       email: emailId,
-      read: false
+      read: false,
     };
 
-    fetch(
-      `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailAddress}/inbox.json`,
-      {
-        method: "POST",
-        body: JSON.stringify(emailData),
-        headers: { "Content-Type": "application/json" },
-      }
-    )
-      .then((response) => {
-        if (response.ok) {
-          console.log("Email sent successfully");
-          setToEmail("");
-          setSubject("");
-          setBody("");
-        } else {
-          console.log("Failed to send email");
+    try {
+      const sendEmailResponse = await fetch(
+        `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailAddress}/inbox.json`,
+        {
+          method: "POST",
+          body: JSON.stringify(emailData),
+          headers: { "Content-Type": "application/json" },
         }
-      })
-      .catch((error) => {
-        console.log("Error sending email:", error);
-      });
+      );
 
-    fetch(
-      `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailId}/sentmails.json`,
-      {
-        method: "POST",
-        body: JSON.stringify(emailData),
-        headers: { "Content-Type": "application/json" },
+      if (sendEmailResponse.ok) {
+        console.log("Email sent successfully");
+        setToEmail("");
+        setSubject("");
+        setBody("");
+      } else {
+        console.log("Failed to send email");
       }
-    )
-      .then((response) => {})
-      .catch((error) => {
-        console.log("Error sending email:", error);
-      });
+    } catch (error) {
+      console.log("Error sending email:", error);
+    }
+
+    try {
+      const sentEmailResponse = await fetch(
+        `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailId}/sentmails.json`,
+        {
+          method: "POST",
+          body: JSON.stringify(emailData),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!sentEmailResponse.ok) {
+        console.log("Error sending email");
+      }
+    } catch (error) {
+      console.log("Error sending email:", error);
+    }
 
     console.log("Sending email...");
     console.log("To: ", toEmail);
-
     console.log("Subject: ", subject);
     console.log("Body: ", body);
 
     setToEmail("");
-
     setSubject("");
     setBody("");
   };
+
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      // Fetch the list of mails from the backend API
+      fetchMails();
+    }, 2000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const fetchMails = async () => {
+    try {
+      const response = await fetch(
+        `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailId}/inbox.json`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        // Process and update the UI with the received mails
+        // ...
+      } else {
+        throw new Error("Error fetching emails");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
