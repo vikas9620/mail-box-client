@@ -34,18 +34,12 @@ const SentEmailsPage = () => {
   };
   useEffect(() => {
     fetchMails();
-    
-  },[]);
+  }, []);
 
- 
- 
   const renderEmails = () => {
     return emails.map((email) => (
       <Accordion key={email.id}>
-        <Accordion.Item
-          eventKey={email.id.toString()}
-         
-        >
+        <Accordion.Item eventKey={email.id.toString()}>
           <Accordion.Header
             style={{
               display: "flex",
@@ -53,8 +47,7 @@ const SentEmailsPage = () => {
               alignItems: "center",
             }}
           >
-         {email.subject}
-            
+            {email.subject}
           </Accordion.Header>
           <Accordion.Body>{email.body}</Accordion.Body>
         </Accordion.Item>

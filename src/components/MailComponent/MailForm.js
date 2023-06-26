@@ -9,7 +9,7 @@ import htmlToDraft from "html-to-draftjs";
 import { useSelector } from "react-redux";
 const EmailForm = () => {
   const [toEmail, setToEmail] = useState("");
-const emailId = useSelector(state=> state.auth.userId)
+  const emailId = useSelector((state) => state.auth.userId);
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -44,51 +44,54 @@ const emailId = useSelector(state=> state.auth.userId)
       alert("Invalid email");
       return;
     }
-  
+
     if (subject.trim() === "") {
       alert("Subject is required");
       return;
     }
-    const emailAddress = toEmail.replace(/[@.]/g, "")
+    const emailAddress = toEmail.replace(/[@.]/g, "");
 
     const emailData = {
       subject: subject,
-      body: body.replace(/<p>/g, '').replace(/<\/p>/g, ''),
-      email: emailId
+      body: body.replace(/<p>/g, "").replace(/<\/p>/g, ""),
+      email: emailId,
+      read: false
     };
-  
 
-    fetch(`https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailAddress}/inbox.json`,{
-      method: "POST",
-      body: JSON.stringify(emailData),
-      headers: { 'Content-Type': 'application/json' },
-    })
-    .then(response => {
-      if (response.ok) {
-        console.log("Email sent successfully");
-        setToEmail("");
-        setSubject("");
-        setBody("");
-      } else {
-        console.log("Failed to send email");
+    fetch(
+      `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailAddress}/inbox.json`,
+      {
+        method: "POST",
+        body: JSON.stringify(emailData),
+        headers: { "Content-Type": "application/json" },
       }
-    })
-    .catch(error => {
-      console.log("Error sending email:", error);
-    });
+    )
+      .then((response) => {
+        if (response.ok) {
+          console.log("Email sent successfully");
+          setToEmail("");
+          setSubject("");
+          setBody("");
+        } else {
+          console.log("Failed to send email");
+        }
+      })
+      .catch((error) => {
+        console.log("Error sending email:", error);
+      });
 
-    fetch(`https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailId}/sentmails.json`,{
-      method: "POST",
-      body: JSON.stringify(emailData),
-      headers: { 'Content-Type': 'application/json' },
-    })
-    .then(response => {
-    })
-    .catch(error => {
-      console.log("Error sending email:", error);
-    });
-
-
+    fetch(
+      `https://mail-box-client-7bbd8-default-rtdb.firebaseio.com/${emailId}/sentmails.json`,
+      {
+        method: "POST",
+        body: JSON.stringify(emailData),
+        headers: { "Content-Type": "application/json" },
+      }
+    )
+      .then((response) => {})
+      .catch((error) => {
+        console.log("Error sending email:", error);
+      });
 
     console.log("Sending email...");
     console.log("To: ", toEmail);
@@ -100,13 +103,12 @@ const emailId = useSelector(state=> state.auth.userId)
 
     setSubject("");
     setBody("");
-  
   };
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-  
+
   return (
     <div className="container mt-5">
       <div className="card">
@@ -148,7 +150,8 @@ const emailId = useSelector(state=> state.auth.userId)
                 margin: "1px",
               }}
             />
-            <textarea hidden
+            <textarea
+              hidden
               value={draftToHtml(convertToRaw(editorState.getCurrentContent()))}
               onChange={handleTextAreaChange}
             />

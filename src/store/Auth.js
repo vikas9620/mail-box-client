@@ -4,6 +4,7 @@ const initialvalue = {
   isLoggedIn: localStorage.getItem("isLoggedIn") === "true",
   token: localStorage.getItem("token") || null,
   userId: localStorage.getItem("userId") || null,
+  unreadCount: 0,
 };
 
 const authSlice = createSlice({
@@ -30,6 +31,9 @@ const authSlice = createSlice({
       state.userId = action.payload.userId;
       localStorage.setItem("userId", action.payload.userId);
     },
+    setUnreadCount(state, action) {
+      state.unreadCount= action.payload.unreadCount
+    }
   },
 });
 
