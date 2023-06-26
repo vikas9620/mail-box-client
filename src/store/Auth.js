@@ -5,6 +5,7 @@ const initialvalue = {
   token: localStorage.getItem("token") || null,
   userId: localStorage.getItem("userId") || null,
   unreadCount: 0,
+  sentMailsCount: 0,
 };
 
 const authSlice = createSlice({
@@ -33,6 +34,9 @@ const authSlice = createSlice({
     },
     setUnreadCount(state, action) {
       state.unreadCount= action.payload.unreadCount
+    },
+    setSentMailsCount(state, action) {
+      state.sentMailsCount = action.payload.sentMailsCount
     }
   },
 });

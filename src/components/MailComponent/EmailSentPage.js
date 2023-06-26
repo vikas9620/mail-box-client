@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Accordion, Container, ListGroup } from "react-bootstrap";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { authAction } from "../../store/Auth";
 
 const SentEmailsPage = () => {
   const [emails, setEmails] = useState([]);
   const email = useSelector((state) => state.auth.userId);
-
+const dispatch=useDispatch()
   const fetchMails = async () => {
     try {
       const response = await fetch(
@@ -25,6 +26,9 @@ const SentEmailsPage = () => {
           return { id: emailId, ...email };
         });
         setEmails(updatedEmails);
+        const count= updatedEmails.length
+        dispatch(authAction.setSentMailsCount({sentMailsCount: count}))
+
       } else {
         throw new Error("Error fetching emails");
       }

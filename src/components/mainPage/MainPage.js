@@ -21,6 +21,7 @@ const MainPage = () => {
   const [page, setPage] = useState("");
   const user = useSelector((state) => state.auth.userId);
   const unreadmails = useSelector((state) => state.auth.unreadCount)
+  const sentEmails = useSelector((state) => state.auth.sentMailsCount)
   let inboxCount = 1;
   const navigate = useNavigate();
   const logoutHandler = () => {
@@ -119,7 +120,7 @@ const MainPage = () => {
             Email Sent
             {inboxCount > 0 && (
               <Badge pill bg="danger" className="count">
-                {0}
+                {sentEmails}
               </Badge>
             )}
           </Button>
