@@ -38,7 +38,7 @@ const DeletedMails = () => {
 
   const renderEmails = () => {
     return emails.map((email) => (
-      <Accordion key={email.id}>
+      <Accordion key={email.id} >
         <Accordion.Item eventKey={email.id.toString()}>
           <Accordion.Header
             style={{
@@ -56,7 +56,8 @@ const DeletedMails = () => {
   };
 
   return (
-    <Container>
+    <Container style={{background: 'rgb(131,58,180)',marginTop: '1rem',
+        background: 'linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%)'}}>
       <ListGroup>{renderEmails()}</ListGroup>
     </Container>
   );
