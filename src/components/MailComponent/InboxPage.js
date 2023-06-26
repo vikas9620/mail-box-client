@@ -34,8 +34,7 @@ const InboxMails = () => {
   };
   useEffect(() => {
     fetchMails();
-    
-  },[]);
+  }, []);
 
   const markAsRead = (emailId) => {
     setEmails((prevEmails) => {
@@ -68,8 +67,14 @@ const InboxMails = () => {
           >
             <span>{email.subject}</span>
             <div>
-            <Button variant='outline-danger' size="sm" onClick={() => deleteEmail(email.id)}>Delete</Button>
-          </div>
+              <Button
+                variant="outline-danger"
+                size="sm"
+                onClick={() => deleteEmail(email.id)}
+              >
+                Delete
+              </Button>
+            </div>
           </Accordion.Header>
           <Accordion.Body>{email.body}</Accordion.Body>
         </Accordion.Item>
