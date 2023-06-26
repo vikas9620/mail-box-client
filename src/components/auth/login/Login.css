@@ -1,0 +1,17 @@
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  
+  .password-toggle svg {
+    font-size: 20px;
+    color: #ccc;
+  }
+  
+  .password-toggle:hover svg {
+    color: #000;
+  }
+  

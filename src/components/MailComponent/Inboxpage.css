@@ -1,0 +1,16 @@
+.email {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
+  .email.read {
+    background-color: #382dcc;
+  }
+  
+  .email.highlight {
+    background-color: rgb(126, 229, 243);
+  }
+  

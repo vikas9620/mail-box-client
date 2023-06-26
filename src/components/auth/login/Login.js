@@ -5,54 +5,64 @@ import FloatingLabel from "react-bootstrap/esm/FloatingLabel";
 
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import "./Login.css";
+import { useDispatch, useSelector } from "react-redux";
+import { authAction } from "../../../store/Auth";
 const Login = () => {
   const emailRef = useRef();
   const passwordRef = useRef();
- const [token, setToken] = useState(null)
-const navigate = useNavigate()
+const token= useSelector(state=>state.auth.token)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword((prevState) => !prevState);
+  };
   const loginHandler = (e) => {
     e.preventDefault();
 
     const loginDetails = {
-        email: emailRef.current.value,
-        password: passwordRef.current.value,
-      }
-    
-      const login = async () => {
-       
-        try {
-          const response = await fetch(
-            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDhgfETDmnPsAS67cOwZ1v4vIl9_86xuJ4",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                ...loginDetails,
-                returnSecureToken: true,
-              }),
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setToken(data.idToken)
-            localStorage.setItem("token", data.idToken)
-            localStorage.setItem('email', data.email)
-            console.log("user login successful");
-            navigate('/')
-           
-          }
-        } catch (err) {
-          console.log("failed to login");
-        }
-      
+      email: emailRef.current.value,
+      password: passwordRef.current.value,
+    };
 
-    }
+    const login = async () => {
+      try {
+        const response = await fetch(
+          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDhgfETDmnPsAS67cOwZ1v4vIl9_86xuJ4",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              ...loginDetails,
+              returnSecureToken: true,
+            }),
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          dispatch(
+            authAction.setUserId({
+              userId: responseData.email.replace(/[@.]/g, ""),
+            })
+          );
+
+          dispatch(authAction.setToken({ token: responseData.idToken }));
+
+          navigate("/");
+          dispatch(authAction.login());
+          console.log("user login successful");
+          localStorage.setItem('authToken',token );
+        }
+      } catch (err) {
+        console.log("failed to login");
+      }
+    };
     login(loginDetails);
-    emailRef.current.value=''
-    passwordRef.current.value=''
-   console.log(token)
+    emailRef.current.value = "";
+    passwordRef.current.value = "";
   };
 
   return (
@@ -78,7 +88,7 @@ const navigate = useNavigate()
             className="mb-2"
             style={{ textAlign: "center", paddingBottom: "1rem" }}
           >
-           Login
+            Login
           </h4>
 
           <FloatingLabel
@@ -91,7 +101,6 @@ const navigate = useNavigate()
               placeholder="Enter email"
               size="small"
               ref={emailRef}
-              required
             />
           </FloatingLabel>
 
@@ -101,15 +110,13 @@ const navigate = useNavigate()
             label="Password"
           >
             <Form.Control
-              type="password"
-              placeholder="Password"
+              type={showPassword ? "text" : "password"}
               ref={passwordRef}
-              required
             />
+            <div className="password-toggle" onClick={toggleShowPassword}>
+              {!showPassword ? <FiEyeOff /> : <FiEye />}
+            </div>
           </FloatingLabel>
-
-        
-           
 
           <div className="text-center">
             <Button
@@ -123,8 +130,14 @@ const navigate = useNavigate()
           </div>
         </Form>
       </Card>
-      <Button style={{ marginTop: "1rem" }} variant="outline-dark" onClick={()=>{navigate('/signup')}}>
-       Don't Have an account? Sign up
+      <Button
+        style={{ marginTop: "1rem" }}
+        variant="outline-dark"
+        onClick={() => {
+          navigate("/signup");
+        }}
+      >
+        Don't Have an account? Sign up
       </Button>
     </div>
   );
